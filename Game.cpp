@@ -14,7 +14,7 @@ Game::Game()
 void Game::play()
 {
 	ready_game(); 
-    player play(1, sf::Vector2f(650, 800)); //tworzenie gracza 
+    player play(1, sf::Vector2f(650, 790)); //tworzenie gracza 
     sf::RenderWindow window(sf::VideoMode(800, 1000), "Cloud tower"); // tworzenie okna 
     
 	window.setFramerateLimit(60);	
