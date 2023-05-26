@@ -39,7 +39,7 @@ void bomb::animate_boom(sf::Clock clock) // animacja wybuchu
 {
 		czas = clock.getElapsedTime();
 		if (czas.asSeconds() < 0.1)
-			setTextureRect(sf::IntRect(30, 20, 40, 100));
+			setTextureRect(sf::IntRect(30, 20, 40, 100));		
 		else if (czas.asSeconds() < 0.2)
 			setTextureRect(sf::IntRect(80, 20, 100, 120));
 		else if (czas.asSeconds() < 0.4)

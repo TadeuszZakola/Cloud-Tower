@@ -92,11 +92,11 @@ void Game::next_screen(player &play, const sf::Time& elapsed) // funkcja rusza w
 		{
 			game_speed += 0.00025;
 		}
-		if (play.getPosition().y < 100) // zabezpieczenie aby gracz nie wyskoczyl poza ekran 
+		if (play.getPosition().y < 200) // zabezpieczenie aby gracz nie wyskoczyl poza ekran 
 		{
 
-			move_all((sf::Vector2f(0, 100 - play.getPosition().y)));
-			play.move(sf::Vector2f(0, 100 - play.getPosition().y));
+			move_all((sf::Vector2f(0, 200 - play.getPosition().y)));
+			play.move(sf::Vector2f(0, 200 - play.getPosition().y));
 		}
 		for (auto& x : bomby) // bomby 
 		{
