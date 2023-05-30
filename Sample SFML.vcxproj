@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bomb.cpp" />
+    <ClCompile Include="coin.cpp" />
     <ClCompile Include="disappearing_platform.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="moving_platform.cpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bomb.h" />
+    <ClInclude Include="coin.h" />
     <ClInclude Include="disappearing_platform.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="moving_platform.h" />

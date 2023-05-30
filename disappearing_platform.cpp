@@ -19,6 +19,7 @@ void disappearing_platform::update() // platforma znika w okreslonych interwalac
 	if (czas.asSeconds() == offset)
 	{
 		clock.restart(); 
+		offset = 2000; // ustawiamy wartosc ktorej nigdy nie osiagnie , poniewaz platformy sa juz rozstrojone od siebie 
 	}
 	czas = clock.getElapsedTime(); 
 	if (czas.asSeconds() > switch_speed.x)

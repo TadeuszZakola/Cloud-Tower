@@ -16,13 +16,15 @@ player::player(int klasa_gracza, sf::Vector2f pos)
 	setTextureRect(sf::IntRect(0, 0, 48, 48));
 	grawitacja = sf::Vector2f(0, 0.3); 
 	stan = alive; 
+	score = 0; 
 }
-void player::update(sf::RenderWindow& okno, std::vector<platform*> platformy, std::vector<bomb*> bomby)
+void player::update(sf::RenderWindow& okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety)
 {    //  // sprawdzilismy w funckji collision czy kolizja wystepuje z ruchom¹ platforma. jezeli tak to move_platforma jest rozna od zera a za razem gracz "jedzie" z platforma
 	move_x(platformy);
 	move_y(platformy);
 	if_przegrana(bomby); // sprawdzanie czy gracz zyje 
 	animate(); // po zakonczonym ruszaniu gracza animujemy go na podstawie zmienionej pozycji 
+	add_score(monety); // sprawdza kolizje z monetami nastepnie zwieksza wynik gracza 
 	draw(okno);
 }
 
@@ -119,17 +121,18 @@ void player::animate() // funkcja animate pobiera kierunek ruchu gracza , tzn le
 		setTextureRect(sf::IntRect(480, 0, 48, 48)); 
 			else if (time.asSeconds() < 1.5)
 		setTextureRect(sf::IntRect(528, 0, 48, 48));
-			
-		if (kierunek == left && getScale().x == 2)
+		if (kierunek == left && getScale().x == 2) // obracanie sprita w lewo 
 		{
 			setScale(-2, 2);
-			move(96, 0);
+			move(96, 0); // aby sie gracz nie teleportowal trzeba go ruszyc o dwukrotnosc szerokosci sprita 
+			std::cout << "jestem tutaj";
 		}
-		else if (kierunek == right && getScale().x == -2)
+		else  if (kierunek == right && getScale().x == -2) // obracanie sprita w prawo 
 		{
 			setScale(2, 2);
-			move(-96, 0);
+			move(-96, 0); // tak samo tylko  w druga strone 
 		}
+			
 	}
 	else if(kierunek == stand) // gdy stoi 
 
@@ -140,7 +143,7 @@ void player::animate() // funkcja animate pobiera kierunek ruchu gracza , tzn le
 	{
 		setTextureRect(sf::IntRect(140, 0, 48, 48));
 	}
-	
+
 
 }
 
@@ -178,4 +181,23 @@ void player::move_y(std::vector<platform*> platformy)
 	{
 		kierunek = fall; // jezeli kolizja nie wystapila oraz predkosc gracza jest wieksza od zera to znaczy , ze gracz spada
 	}
+}
+
+void player::add_score(std::vector<coin*> *monety)
+{
+	for (auto& m : *monety)
+	{
+		if (this->getGlobalBounds().intersects(m->getGlobalBounds()))
+		{
+			score++; 
+			auto element = std::find(monety->begin(), monety->end(), m);
+			delete(m);
+			monety->erase(element);
+		}
+	}
+}
+
+int player::return_score()
+{
+	return score;
 }

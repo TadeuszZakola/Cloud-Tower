@@ -1,23 +1,24 @@
 #include "Game.h"
 #include "player.h"
+#include "coin.h"
+#include <algorithm>
 #include <vector>
 Game::Game()
 {
 	std::cout << "Witamy w cloud TOWER!" << std::endl; 
 	std::cout << "Wykonali :" << std::endl; 
 	std::cout << "Aby zaczac wcisnij dowolny przycisk :-)" << std::endl;
-	std::cin.get();
-	pauza_bool = true; 
-	
+	std::cin.get(); 	
 }
 
 void Game::play()
 {
 	ready_game(); 
     player play(1, sf::Vector2f(650, 790)); //tworzenie gracza 
-    sf::RenderWindow window(sf::VideoMode(800, 1000), "Cloud tower"); // tworzenie okna 
-    
+    sf::RenderWindow window(sf::VideoMode(800, 1000), "Cloud tower"); // tworzenie okna  
 	window.setFramerateLimit(60);	
+	monety->emplace_back(new coin(sf::Vector2f(400, 400))); 
+	monety->emplace_back(new coin(sf::Vector2f(400, 400)));
 	ready_background_texture(); 
 	draw_tlo(window); // tutaj zaimplementuj menu pobierz ten window ;  
 	while (window.isOpen())
@@ -35,7 +36,7 @@ void Game::play()
 		draw_tlo(window); // rysowanie tla , tlo sklada sie z 6 grafik nalozonych na siebie 
 		update_all(play, elapsed); // updatowanie pozycji platform oraz bomb nastepnie rysowanie ich		
         draw_all(window); // rysowanie wszystkich obiektow poza graczem 
-		play.update(window, platformy, bomby); // update gracza na podstawie pozycji platform i innych rzeczy nastepnie rysowanie go 
+		play.update(window, platformy, bomby , monety); // update gracza na podstawie pozycji platform i innych rzeczy nastepnie rysowanie go  
 		window.display(); // wyswietlanie klatki gry
 		if (play.get_status() == player::dead) // sprawdzanie warunku konca gry  , sam status dead czy alive jest aktualizowany w funkcji update
 		{
@@ -46,25 +47,45 @@ void Game::play()
 void Game::generate_platform() 
 
 	{
+	int los_monety = rand() % 4; 
 		if (platformy.size() < 8) 
 		{
 			int los = rand() % 6;
 			if (los == 1 || los ==2)
 			{
 				platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(generate_rand_dist(), platformy.back()->getPosition().y - 200)));
+				if (los_monety == 3)
+					monety->emplace_back(new coin(sf::Vector2f(platformy.back()->getPosition().x + rand() % 100, platformy.back()->getPosition().y - 50))); 
 			}
 			else if (los == 3 || los == 4)
+			{
 				platformy.emplace_back(new moving_platform(sf::Vector2f((rand() % 30) / 10 + 2, 0), sf::Vector2f(200, 50), sf::Vector2f(generate_rand_dist(), platformy.back()->getPosition().y - 200)));
-			else if (los ==5)
-				platformy.emplace_back(new disappearing_platform(sf::Vector2f(3 + (rand()%30) / 10, 1.2 - (rand()%50) / 100), sf::Vector2f(200, 50), sf::Vector2f(generate_rand_dist(), platformy.back()->getPosition().y - 200)));
+				if (los_monety == 3)
+				monety->emplace_back(new coin(sf::Vector2f(platformy.back()->getPosition().x + rand() % 100, platformy.back()->getPosition().y - 50)));
+			}
+			else if (los == 5)
+			{
+				platformy.emplace_back(new disappearing_platform(sf::Vector2f(3 + (rand() % 30) / 10, 1.2 - (rand() % 50) / 100), sf::Vector2f(200, 50), sf::Vector2f(generate_rand_dist(), platformy.back()->getPosition().y - 200)));
+				if (los_monety == 3)
+					monety->emplace_back(new coin(sf::Vector2f(platformy.back()->getPosition().x + rand() % 100, platformy.back()->getPosition().y - 50)));
+			}
 		}
-		if (platformy.front()->getPosition().y > 1000)
+		if (platformy.front()->getPosition().y > 1000 )
 		{
 
 			delete platformy.front();
 			platformy.erase(platformy.begin());
 		}
-
+			for (auto m : *monety)
+			{
+				if (m->getPosition().y > 1000)
+				{
+					auto element = std::find(monety->begin(), monety->end(), m);
+					delete m; 
+					monety->erase(element);
+				}
+			}
+		
 	}
 
 
@@ -73,6 +94,10 @@ void Game::move_all(sf::Vector2f ruch)
 	for (auto& p : platformy)
 	{
 		p->move(ruch); 
+	}
+	for (auto& m : *monety)
+	{
+		m->move(ruch); 
 	}
 }
 
@@ -92,27 +117,26 @@ void Game::next_screen(player &play, const sf::Time& elapsed) // funkcja rusza w
 		{
 			game_speed += 0.00025;
 		}
-		if (play.getPosition().y < 200) // zabezpieczenie aby gracz nie wyskoczyl poza ekran 
+		if (play.getPosition().y < 100) // zabezpieczenie aby gracz nie wyskoczyl poza ekran 
 		{
 
-			move_all((sf::Vector2f(0, 200 - play.getPosition().y)));
-			play.move(sf::Vector2f(0, 200 - play.getPosition().y));
+			move_all((sf::Vector2f(0, 100 - play.getPosition().y)));
+			play.move(sf::Vector2f(0, 100 - play.getPosition().y));
 		}
 		for (auto& x : bomby) // bomby 
 		{
-			x->move(sf::Vector2f(0 * elapsed.asMilliseconds(), 4 * game_speed * elapsed.asMilliseconds()));
+			x->move(sf::Vector2f(0 * elapsed.asMilliseconds(), 3 * game_speed * elapsed.asMilliseconds()));
 		}
-		player_score += game_speed * 5; // naliczanie punktow dla gracza 
 }
 
 void Game::ready_game() // przygotowanie gry , ladowanie grafik oraz ustalanie poczatkowych wartosci zmiennych
 {
 	ready_background_texture(); 
 	srand((unsigned)time(NULL));
-	player_score = 0; 
 	platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(600, 900)));
 	bomby.emplace_back(new bomb(sf::Vector2f(400, 20000)));
 	game_speed = 0; 
+	monety = new std::vector<coin*>; 
 	
 	
 }
@@ -177,6 +201,11 @@ void Game::update_all(player& play, const sf::Time& elapsed)
 	{
 		x->update();
 	}
+	if (monety->size() > 0)
+	for (auto& m : *monety)
+	{
+		m->update(); 
+	}
 	next_screen(play, elapsed); // updatowanie pozycji bomb oraz platform 
 }
 
@@ -189,7 +218,11 @@ void Game::draw_all(sf::RenderWindow& window)
 	for (auto& x : bomby)
 	{
 		window.draw(*x);
-	}
+	}	
+		for (auto& m : *monety)
+		{
+			window.draw(*m);
+		}
 }
 
 void Game::death(player& play, sf::RenderWindow& window) // ekran smierci 
@@ -199,7 +232,7 @@ void Game::death(player& play, sf::RenderWindow& window) // ekran smierci
 		if (play.getGlobalBounds().intersects(x->getGlobalBounds()))
 		{
 			sf::Clock zegar;
-			x->move(sf::Vector2f(-80, 0));
+			x->move(sf::Vector2f(-100, 0));
 			while (zegar.getElapsedTime().asSeconds() < 2)
 			{
 				window.clear(sf::Color::White);
@@ -215,7 +248,7 @@ void Game::death(player& play, sf::RenderWindow& window) // ekran smierci
 	system("CLS");
 	std::cout << "Przegrales!" << std::endl;
 	std::cout << "Wcisnij cokolwiek aby kontynuowac" << std::endl;
-	std::cout << "Wynik gracza to: " << std::round(player_score) << std::endl; 
+	std::cout << "Wynik gracza to: " << std::round(play.return_score()) << std::endl; 
 	std::cin.get();
 	window.close();
 }

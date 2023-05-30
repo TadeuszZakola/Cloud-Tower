@@ -12,7 +12,7 @@ class Game
 	void play();
 private:
 	// funkcje generujace 
-	void generate_platform(); 
+	void generate_platform(); // generuje platformy z szansa na wygenerowanie monety na jednej z nich
 	void generate_bombs();
 	float generate_rand_dist(); // generuje dystans w okreslonym przedziale , aby gracz doskoczyl do kazdej platformy 
 
@@ -35,6 +35,7 @@ private:
 	// vectory obiektow na planszy 
 	std::vector<platform*> platformy;
 	std::vector<bomb*> bomby; 
+	std::vector<coin*> *monety; 
 
 	// zmienne czasowe do animacji bomby
 	sf::Clock bomb_clock; 
@@ -58,7 +59,6 @@ private:
 	// zmienne dodatkowe
 	sf::Clock clock;
 	bool pauza_bool;
-	float game_speed;
-	float player_score; 
+	float game_speed; 
 };
 
