@@ -17,8 +17,6 @@ void Game::play()
     player play(1, sf::Vector2f(650, 790)); //tworzenie gracza 
     sf::RenderWindow window(sf::VideoMode(800, 1000), "Cloud tower"); // tworzenie okna  
 	window.setFramerateLimit(60);	
-	monety->emplace_back(new coin(sf::Vector2f(400, 400))); 
-	monety->emplace_back(new coin(sf::Vector2f(400, 400)));
 	ready_background_texture(); 
 	draw_tlo(window); // tutaj zaimplementuj menu pobierz ten window ;  
 	while (window.isOpen())
