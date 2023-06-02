@@ -18,7 +18,7 @@ player::player(int klasa_gracza, sf::Vector2f pos)
 	stan = alive; 
 	score = 0; 
 }
-void player::update(sf::RenderWindow& okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety)
+void player::update(sf::RenderWindow* okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety)
 {    //  // sprawdzilismy w funckji collision czy kolizja wystepuje z ruchom¹ platforma. jezeli tak to move_platforma jest rozna od zera a za razem gracz "jedzie" z platforma
 	move_x(platformy);
 	move_y(platformy);
@@ -49,9 +49,9 @@ sf::Vector2f player::sprawdz_klaw() // na podstawie inputu gracza rusza go w osi
 	return predkosc;
 }
 
-void player::draw(sf::RenderWindow& okno)
+void player::draw(sf::RenderWindow* okno)
 {
-	okno.draw(*this);
+	okno->draw(*this);
 }
 
 bool player::collision(std::vector<platform*> platformy, bool blokada) // funkcja sprawdzajaca kolizje miedzy graczem a obiektami 
@@ -68,7 +68,7 @@ bool player::collision(std::vector<platform*> platformy, bool blokada) // funkcj
 		 else if (getGlobalBounds().intersects(platforma->getGlobalBounds()) && v_gracz.y < 0)
 		 {
 			 move(0, -0.1); // debugging , tzn jezeli gracz znajduje sie w platformie oraz spada to zamiast zatrzymac sie to nie zablokuje sie 
-		 }	
+		 }
 	}
 	return kolizja; 
 }
@@ -125,7 +125,6 @@ void player::animate() // funkcja animate pobiera kierunek ruchu gracza , tzn le
 		{
 			setScale(-2, 2);
 			move(96, 0); // aby sie gracz nie teleportowal trzeba go ruszyc o dwukrotnosc szerokosci sprita 
-			std::cout << "jestem tutaj";
 		}
 		else  if (kierunek == right && getScale().x == -2) // obracanie sprita w prawo 
 		{

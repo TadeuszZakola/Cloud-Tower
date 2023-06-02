@@ -15,7 +15,7 @@ class player : public sf::Sprite
 	};
 public:
 	player(int klasa, sf::Vector2f pos); 		
-	void update(sf::RenderWindow& okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety ); // updatuje pozycje oraz predkosc gracza
+	void update(sf::RenderWindow* okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety ); // updatuje pozycje oraz predkosc gracza
 	status get_status(); // zwraca enuma stan , tzn dead lub alive
 	int return_score(); 
 private:
@@ -24,7 +24,7 @@ private:
 	void move_x(std::vector<platform*> platformy); // ruch w osi x
 	void move_y(std::vector<platform*> platformy); // ruch w osi y 
 	sf::Vector2f sprawdz_klaw(); // sprawdza wcisniete klawisze 
-	void draw(sf::RenderWindow& okno);	// rysuje gracza , jest elementem funckji update
+	void draw(sf::RenderWindow* okno);	// rysuje gracza , jest elementem funckji update
     void if_przegrana(std::vector<bomb*> bomby); // sprawdza czy grac zyje czy nie 
 	void add_score(std::vector<coin*> *monety);
 private:

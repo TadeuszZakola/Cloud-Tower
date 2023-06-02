@@ -10,6 +10,7 @@ class Game
 { public:
 	Game();
 	void play();
+	void draw_tlo(sf::RenderWindow* window);
 private:
 	// funkcje generujace 
 	void generate_platform(); // generuje platformy z szansa na wygenerowanie monety na jednej z nich
@@ -22,16 +23,17 @@ private:
 
 	// funkcje updatujace
 	void update_all(player& play, const sf::Time& elapsed); // updatuje kazda platforme 
-    void death(player& play ,  sf::RenderWindow& window); // ekran smierci 
+    void death(player& play ,  sf::RenderWindow* window); // ekran smierci 
     void move_all(sf::Vector2f ruch); // rusza wszystkie platformy 
 	void next_screen(player &play, const sf::Time& elapsed); // przygotowanie nastepnej klatki 
-	void pauza(sf::RenderWindow &window); // ekran pauzy 
+	void pauza(sf::RenderWindow *window,player& gracz); // ekran pauzy 
 
 	// funkcje rysujace	
-	void draw_tlo(sf::RenderWindow &window); 	
-	void draw_all(sf::RenderWindow& window);	
+	//void draw_tlo(sf::RenderWindow *window); 	
+	void draw_all(sf::RenderWindow* window);	
 
 private:
+	sf::RenderWindow *window;
 	// vectory obiektow na planszy 
 	std::vector<platform*> platformy;
 	std::vector<bomb*> bomby; 
