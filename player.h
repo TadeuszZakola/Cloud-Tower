@@ -25,7 +25,7 @@ private:
 	void move_y(std::vector<platform*> platformy); // ruch w osi y 
 	sf::Vector2f sprawdz_klaw(); // sprawdza wcisniete klawisze 
 	void draw(sf::RenderWindow* okno);	// rysuje gracza , jest elementem funckji update
-    void if_przegrana(std::vector<bomb*> bomby); // sprawdza czy grac zyje czy nie 
+    void if_przegrana(std::vector<bomb*> bomby , std::vector<platform*> platformy); // sprawdza czy grac zyje czy nie 
 	void add_score(std::vector<coin*> *monety);
 private:
 	sf::Vector2f v_gracz; // predkosc gracza

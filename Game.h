@@ -13,8 +13,8 @@ class Game
 	void draw_tlo(sf::RenderWindow* window);
 private:
 	// funkcje generujace 
-	void generate_platform(); // generuje platformy z szansa na wygenerowanie monety na jednej z nich
-	void generate_bombs();
+	void generate_platform(player play); // generuje platformy z szansa na wygenerowanie monety na jednej z nich
+	void generate_bombs(player play);
 	float generate_rand_dist(); // generuje dystans w okreslonym przedziale , aby gracz doskoczyl do kazdej platformy 
 
 	// funkcje przygotowywujace
@@ -31,9 +31,12 @@ private:
 	// funkcje rysujace	
 	//void draw_tlo(sf::RenderWindow *window); 	
 	void draw_all(sf::RenderWindow* window);	
+	// funkcja obslugujaca minimape
+	void update_minimap(player play); 
 
 private:
 	sf::RenderWindow *window;
+	sf::RenderWindow* minimap; 
 	// vectory obiektow na planszy 
 	std::vector<platform*> platformy;
 	std::vector<bomb*> bomby; 
@@ -62,5 +65,8 @@ private:
 	sf::Clock clock;
 	bool pauza_bool;
 	float game_speed; 
+	//
+	sf::View view_game;
+	sf::View viev_minimap;
 };
 

@@ -12,5 +12,6 @@ class moving_platform :public platform
 private:
 	void move_p(); 
 	sf::Vector2f platform_speed; 
+	sf::Vector2f initial_pos; 
 };
 

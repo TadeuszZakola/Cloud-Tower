@@ -17,15 +17,18 @@ player::player(int klasa_gracza, sf::Vector2f pos)
 	grawitacja = sf::Vector2f(0, 0.3); 
 	stan = alive; 
 	score = 0; 
+	setOrigin(24, 0); 
 }
 void player::update(sf::RenderWindow* okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety)
-{    //  // sprawdzilismy w funckji collision czy kolizja wystepuje z ruchom¹ platforma. jezeli tak to move_platforma jest rozna od zera a za razem gracz "jedzie" z platforma
+{
+	//  // sprawdzilismy w funckji collision czy kolizja wystepuje z ruchom¹ platforma. jezeli tak to move_platforma jest rozna od zera a za razem gracz "jedzie" z platforma
 	move_x(platformy);
 	move_y(platformy);
-	if_przegrana(bomby); // sprawdzanie czy gracz zyje 
+	if_przegrana(bomby , platformy); // sprawdzanie czy gracz zyje 
 	animate(); // po zakonczonym ruszaniu gracza animujemy go na podstawie zmienionej pozycji 
 	add_score(monety); // sprawdza kolizje z monetami nastepnie zwieksza wynik gracza 
 	draw(okno);
+	
 }
 
 sf::Vector2f player::sprawdz_klaw() // na podstawie inputu gracza rusza go w osi X
@@ -35,7 +38,8 @@ sf::Vector2f player::sprawdz_klaw() // na podstawie inputu gracza rusza go w osi
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		predkosc.x = -3;
-		kierunek = left; 
+		kierunek = left;
+
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
@@ -74,9 +78,9 @@ bool player::collision(std::vector<platform*> platformy, bool blokada) // funkcj
 }
 
 
-void player::if_przegrana(std::vector<bomb*> bomby) // sprwadza kolizje miedzy graczem a bombami
+void player::if_przegrana(std::vector<bomb*> bomby , std::vector<platform*> platformy) // sprwadza kolizje miedzy graczem a bombami
 {   
-	if (getGlobalBounds().top + getGlobalBounds().height >= 1000)
+	if (getGlobalBounds().top + getGlobalBounds().height > platformy.front()->getPosition().y + 300)
 	{
 		stan = dead; 
 	}
@@ -124,12 +128,10 @@ void player::animate() // funkcja animate pobiera kierunek ruchu gracza , tzn le
 		if (kierunek == left && getScale().x == 2) // obracanie sprita w lewo 
 		{
 			setScale(-2, 2);
-			move(96, 0); // aby sie gracz nie teleportowal trzeba go ruszyc o dwukrotnosc szerokosci sprita 
 		}
 		else  if (kierunek == right && getScale().x == -2) // obracanie sprita w prawo 
 		{
 			setScale(2, 2);
-			move(-96, 0); // tak samo tylko  w druga strone 
 		}
 			
 	}

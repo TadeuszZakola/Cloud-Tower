@@ -5,6 +5,7 @@ moving_platform::moving_platform(sf::Vector2f speed, sf::Vector2f size, sf::Vect
 	platform_speed = speed; 
 	//setFillColor(sf::Color::Blue);
 	setOutlineColor(sf::Color::Blue);
+	initial_pos = position; 
 	std::cout << "Tworze platforme ruszajaca" << std::endl; 
 }
 
@@ -28,11 +29,11 @@ sf::Vector2f moving_platform::return_speed()
 
 void moving_platform::move_p()
 {
-	if (getGlobalBounds().left <= 0)
+	if (getGlobalBounds().left <= initial_pos.x -400)
 	{
 		platform_speed.x = -platform_speed.x;
 	}
-	if (getGlobalBounds().left + getGlobalBounds().width >= 800)
+	if (getGlobalBounds().left + getGlobalBounds().width >= initial_pos.x + 400)
 	{
 		platform_speed.x = -platform_speed.x;
 	}
