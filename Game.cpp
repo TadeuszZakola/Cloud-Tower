@@ -16,12 +16,12 @@ Game::Game()
 void Game::play()
 {
 	ready_game(); 
-    player play(1, sf::Vector2f(650, 790)); //tworzenie gracza 	
+    player play(1, sf::Vector2f(2050, 790)); //tworzenie gracza 	
 	//platformy.emplace_back(new platform(sf::Vector2f(200, 50) , sf::Vector2f(650 , 700))); 
 	while (window->isOpen())
 	{ 
 		sf::Vector2f play_pos = play.getPosition(); 
-		sf::Time elapsed = clock.restart();
+		//sf::Time elapsed = clock.restart();
 		generate_platform(play); // sprawdzanie pozycji platform , nastepnie generowanie lub usuwanie zbednych platform
 		generate_bombs(play); // to samo tylko z bombami 
 		while (window->pollEvent(event)) // zamkniecie okna 
@@ -32,8 +32,9 @@ void Game::play()
 		pauza(window,play); // pauzuje gre 
 		window->clear(sf::Color::Red); // czyszcenie ekranu 
 		draw_tlo(window); // rysowanie tla , tlo sklada sie z 6 grafik nalozonych na siebie 
-		update_all(play, elapsed); // updatowanie pozycji platform oraz bomb nastepnie rysowanie ich		
+		update_all(play); // updatowanie pozycji platform oraz bomb nastepnie rysowanie ich		
         draw_all(window); // rysowanie wszystkich obiektow poza graczem 
+		move_bombs(); 
 		play.update(window, platformy, bomby , monety); // update gracza na podstawie pozycji platform i innych rzeczy nastepnie rysowanie go 
 		view_game.setCenter(play.getPosition()); 
 		window->setView(view_game); 
@@ -42,7 +43,7 @@ void Game::play()
 		{
 			death(play , window); //jezeli gracz jest 'dead' to funkcja konczy gre 
 		}
-		update_minimap(play); 
+		update_minimap(play); 	
 	}
 }
 void Game::generate_platform(player play) 
@@ -55,24 +56,24 @@ void Game::generate_platform(player play)
 	{
 		kierunek_ruchu = -1; 
 	}
-		if (platformy.size() < 8) 
+		if (platformy.size() < 14) 
 		{
 			int los = rand() % 6;
 			if (los == 1 || los ==2)
 			{ // platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(generate_rand_dist(), platformy.back()->getPosition().y - 200)));
-				platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(platformy.back()->getPosition().x + (50 + rand() % 30)*kierunek_ruchu, platformy.back()->getPosition().y - 200)));
+				platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(platformy.back()->getPosition().x + (70 + rand() % 50)*kierunek_ruchu, platformy.back()->getPosition().y - 200)));
 				if (los_monety == 3)
 					monety->emplace_back(new coin(sf::Vector2f(platformy.back()->getPosition().x + rand() % 100, platformy.back()->getPosition().y - 50))); 
 			}
 			else if (los == 3 || los == 4)
 			{
-				platformy.emplace_back(new moving_platform(sf::Vector2f((rand() % 30) / 10 + 2, 0), sf::Vector2f(200, 50), sf::Vector2f(platformy.back()->getPosition().x + (50 + rand() % 30)*kierunek_ruchu, platformy.back()->getPosition().y - 200)));
+				platformy.emplace_back(new moving_platform(sf::Vector2f((rand() % 30) / 10 + 2, 0), sf::Vector2f(200, 50), sf::Vector2f(platformy.back()->getPosition().x + (70 + rand() % 50)*kierunek_ruchu, platformy.back()->getPosition().y - 200)));
 				if (los_monety == 3)
 				monety->emplace_back(new coin(sf::Vector2f(platformy.back()->getPosition().x + rand() % 100, platformy.back()->getPosition().y - 50)));
 			}
 			else if (los == 5)
 			{
-				platformy.emplace_back(new disappearing_platform(sf::Vector2f(3 + (rand() % 30) / 10, 1.2 - (rand() % 50) / 100), sf::Vector2f(200, 50), sf::Vector2f(platformy.back()->getPosition().x + (50 + rand() % 30)*kierunek_ruchu, platformy.back()->getPosition().y - 200)));
+				platformy.emplace_back(new disappearing_platform(sf::Vector2f(3 + (rand() % 30) / 10, 1.2 - (rand() % 50) / 100), sf::Vector2f(200, 50), sf::Vector2f(platformy.back()->getPosition().x + (70 + rand() % 50)*kierunek_ruchu, platformy.back()->getPosition().y - 200)));
 				if (los_monety == 3)
 					monety->emplace_back(new coin(sf::Vector2f(platformy.back()->getPosition().x + rand() % 100, platformy.back()->getPosition().y - 50)));
 			}
@@ -86,9 +87,10 @@ void Game::generate_platform(player play)
 				platformy.erase(element); 
 			}
 		}
+		if(monety->size()>0)
 			for (auto m : *monety)
 			{
-				if (m->getPosition().y > 1000)
+				if (m->getPosition().y > play.getPosition().y + 400 && monety->size()>0)
 				{
 					auto element = std::find(monety->begin(), monety->end(), m);
 					delete m; 
@@ -112,13 +114,29 @@ void Game::move_all(sf::Vector2f ruch)
 }
 
 
-void Game::next_screen(player &play, const sf::Time& elapsed) // funkcja rusza wszystkie elementy na ekranie w zaleznosci od wysokosci gracza 
+void Game::next_screen(player &play) // funkcja rusza wszystkie elementy na ekranie w zaleznosci od wysokosci gracza 
 {		
-	game_speed = 0.1; 
-		for (auto& x : bomby) // bomby 
-		{
-			x->move(sf::Vector2f(0 * elapsed.asMilliseconds(), 3 * game_speed * elapsed.asMilliseconds()));
-		}
+	if (play.getPosition().y < -1600 && map_number == 1 )
+	{
+		map_number = 2; 
+		platformy.clear(); 
+		play.setPosition(sf::Vector2f(play.getPosition().x, -3250));
+		platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(play.getPosition().x-50, -3200)));
+		//minimap->setPosition(sf::Vector2i(play.getPosition().x - 1000, minimap->getPosition().y));
+		viev_minimap.setCenter(play.getPosition().x , play.getPosition().y -1500);
+		minimap->setView(viev_minimap); 
+	}
+	if (play.getPosition().y < -6500 && map_number == 2)
+	{
+		map_number = 3; 
+		platformy.clear();
+		play.setPosition(sf::Vector2f(play.getPosition().x, -7450));
+		platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(play.getPosition().x - 50, -7350)));
+		viev_minimap.setCenter(play.getPosition().x, play.getPosition().y - 1350);
+		
+		
+		minimap->setView(viev_minimap);
+	}
 }
 
 
@@ -126,19 +144,22 @@ void Game::ready_game() // przygotowanie gry , ladowanie grafik oraz ustalanie p
 {
 	ready_background_texture(); 
 	srand((unsigned)time(NULL));
-	platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(600, 900)));
+	platformy.emplace_back(new platform(sf::Vector2f(200, 50), sf::Vector2f(2000, 900)));
 	bomby.emplace_back(new bomb(sf::Vector2f(400, 20000)));
 	game_speed = 0; 
 	monety = new std::vector<coin*>; 
 	window = new sf::RenderWindow(sf::VideoMode(800, 1000), "Cloud tower"); // tworzenie okna  
-	minimap = new sf::RenderWindow(sf::VideoMode(500, 500), "MiniMap");
+	minimap = new sf::RenderWindow(sf::VideoMode(500, 700), "MiniMap" , sf::Style::None);
 	view_game = sf::View(sf::FloatRect(650, 790, 800.0f, 1000.0f));
-	viev_minimap = sf::View(sf::FloatRect(-1000, -9000, 8000, 9000));
+	viev_minimap = sf::View(sf::FloatRect(1000, -2100, 2428, 3400));
+	//viev_minimap = sf::View(sf::FloatRect(1500, -2000, 2000, 3000));
 	view_game.setCenter(650, 790);
 	window->setView(view_game);
 	window->setFramerateLimit(60);
 	minimap->setView(viev_minimap);
 	minimap->setFramerateLimit(60); 
+	minimap->setPosition(sf::Vector2i(50,300)); 
+	map_number = 1; 
 	ready_background_texture();
 	draw_tlo(window);
 	
@@ -149,10 +170,12 @@ void Game::ready_game() // przygotowanie gry , ladowanie grafik oraz ustalanie p
 void Game::draw_tlo(sf::RenderWindow*window) // rysowanie tla 
 {
 	window->draw(tlo_s);
-	window->draw(tlo_s5); 
-	window->draw(tlo_s3);
-	window->draw(tlo_s4); 
-    window->draw(tlo_s2);
+	//window->draw(tlo_s5);
+	
+	//window->draw(tlo_s4); 
+  
+    window->draw(tlo_s3);
+     window->draw(tlo_s2);
 }
 
 
@@ -190,12 +213,12 @@ void Game::generate_bombs(player play) // tworzenie i usuwanie bomb
 	bomb_time = bomb_clock.getElapsedTime(); 
 	if (bomby.size() < 4 && bomb_time.asSeconds() > 4 && game_speed != 0 )
 	{
-		bomby.emplace_back(new bomb(sf::Vector2f(rand()%800, play.getPosition().y - 1200)));
+		bomby.emplace_back(new bomb(sf::Vector2f((play.getPosition().x -200) + rand()%500, play.getPosition().y - 1200)));
 		bomb_clock.restart(); 
 		std::cout << "tworze bombe " << std::endl;
 	}
 	if(bomby.size()>0)
-	if (bomby.front()->getPosition().y > 1000 && bomby.size() > 0 )
+	if (bomby.front()->getPosition().y > play.getPosition().y + 500 && bomby.size() > 0)
 	{
 		delete bomby.front(); 
 		bomby.erase(bomby.begin()); 
@@ -203,7 +226,7 @@ void Game::generate_bombs(player play) // tworzenie i usuwanie bomb
 }
 
 
-void Game::update_all(player& play, const sf::Time& elapsed)
+void Game::update_all(player& play)
 {
 	for (auto& x : platformy) // updatowanie pozycji platform oraz rysowanie ich
 	{
@@ -214,7 +237,7 @@ void Game::update_all(player& play, const sf::Time& elapsed)
 	{
 		m->update(); 
 	}
-	next_screen(play, elapsed); // updatowanie pozycji bomb oraz platform 
+	next_screen(play); // updatowanie pozycji bomb oraz platform 
 }
 
 
@@ -278,7 +301,7 @@ void Game::pauza(sf::RenderWindow*window, player& gracz)
 		{
 			x->setPosition(std::round(x->getPosition().x), std::round(x->getPosition().y));
 		}
-
+		//pause.Play(window); 
 		draw_all(window);
 		window->draw(gracz);
 		window->display();
@@ -291,30 +314,38 @@ void Game::pauza(sf::RenderWindow*window, player& gracz)
 	}
 }
 
+void Game::move_bombs()
+{
+	for (auto& x : bomby) // bomby 
+	{
+		x->move(sf::Vector2f(0, 3 * game_speed));
+	}
+}
+
 
 void Game::ready_background_texture()
 {
-	if (!tlo1.loadFromFile("assets/parallax-mountain-bg.png"))
+	if (!tlo1.loadFromFile("assets/winter 8/hd.png"))
 	{
 		std::cout << "nie zaladowano tla";
 	}
 	tlo_s.setTexture(tlo1);
-	tlo_s.setScale(30, 50);
-	tlo_s.setPosition(-1000, -9000);
-	if (!tlo2.loadFromFile("assets/parallax-mountain-foreground-trees.png"))
+	tlo_s.setScale(3, 3);
+	tlo_s.setPosition(-1000, -3500);
+	if (!tlo2.loadFromFile("assets/winter 7/hd.png"))
 	{
 		std::cout << "nie zaladowano tla";
 	}
 	tlo_s2.setTexture(tlo2);
-	tlo_s2.setPosition(sf::Vector2f(-1000, 3500-9000));
-	tlo_s2.setScale(sf::Vector2f(40, 40));
-	if (!tlo3.loadFromFile("assets/parallax-mountain-montain-far.png"))
+	tlo_s2.setPosition(sf::Vector2f(-1000, -7000));
+	tlo_s2.setScale(sf::Vector2f(3, 3));
+	if (!tlo3.loadFromFile("assets/winter 4/hd.png"))
 	{
 		std::cout << "nie zaladowano tla";
 	}
 	tlo_s3.setTexture(tlo3);
-	tlo_s3.setPosition(sf::Vector2f(0-1000, -1000-9000));
-	tlo_s3.setScale(sf::Vector2f(40, 70));
+	tlo_s3.setPosition(sf::Vector2f(-1000, -10500));
+	tlo_s3.setScale(sf::Vector2f(3, 3));
 	if (!tlo4.loadFromFile("assets/parallax-mountain-trees.png"))
 	{
 		std::cout << "nie zaladowano tla";

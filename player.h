@@ -15,7 +15,7 @@ class player : public sf::Sprite
 	};
 public:
 	player(int klasa, sf::Vector2f pos); 		
-	void update(sf::RenderWindow* okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety ); // updatuje pozycje oraz predkosc gracza
+	void update(sf::RenderWindow* okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety); // updatuje pozycje oraz predkosc gracza
 	status get_status(); // zwraca enuma stan , tzn dead lub alive
 	int return_score(); 
 private:
@@ -47,5 +47,6 @@ private:
 	sf::Clock clock; 
 	sf::Time time; 
 	travel kierunek;
+	sf::Clock collision_clock; 
 };
 

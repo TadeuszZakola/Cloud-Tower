@@ -22,12 +22,14 @@ private:
 	void ready_background_texture();
 
 	// funkcje updatujace
-	void update_all(player& play, const sf::Time& elapsed); // updatuje kazda platforme 
+	void update_all(player& play); // updatuje kazda platforme 
     void death(player& play ,  sf::RenderWindow* window); // ekran smierci 
     void move_all(sf::Vector2f ruch); // rusza wszystkie platformy 
-	void next_screen(player &play, const sf::Time& elapsed); // przygotowanie nastepnej klatki 
+	void next_screen(player &play); // przygotowanie nastepnej klatki 
 	void pauza(sf::RenderWindow *window,player& gracz); // ekran pauzy 
 
+	//
+	void move_bombs(); 
 	// funkcje rysujace	
 	//void draw_tlo(sf::RenderWindow *window); 	
 	void draw_all(sf::RenderWindow* window);	
@@ -68,5 +70,7 @@ private:
 	//
 	sf::View view_game;
 	sf::View viev_minimap;
+	// 
+	int map_number; 
 };
 

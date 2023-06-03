@@ -172,15 +172,27 @@ void player::move_y(std::vector<platform*> platformy)
 	move(move_platform);
 	if (collision(platformy, false) == true)
 	{
+		
 		setPosition(pozycja);
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{				
+					 if ( collision_clock.getElapsedTime().asSeconds() < 0.05)
+					 {
+						 v_gracz.y -= 30;
+					 }
+					 else
+					v_gracz.y -= 22;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		{
 			v_gracz.y -= 22;
 		}
-	}
-	else if (v_gracz.y > 0)
+		
+	}      
+	 else if (v_gracz.y > 0)
 	{
 		kierunek = fall; // jezeli kolizja nie wystapila oraz predkosc gracza jest wieksza od zera to znaczy , ze gracz spada
+		collision_clock.restart();
 	}
 }
 
