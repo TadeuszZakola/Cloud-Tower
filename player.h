@@ -14,7 +14,8 @@ class player : public sf::Sprite
 		alive
 	};
 public:
-	player(int klasa, sf::Vector2f pos); 		
+	player(int klasa, sf::Vector2f pos); 
+	player(); 
 	void update(sf::RenderWindow* okno, std::vector<platform*> platformy, std::vector<bomb*> bomby , std::vector<coin*> *monety); // updatuje pozycje oraz predkosc gracza
 	status get_status(); // zwraca enuma stan , tzn dead lub alive
 	int return_score(); 

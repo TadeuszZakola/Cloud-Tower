@@ -72,5 +72,6 @@ private:
 	sf::View viev_minimap;
 	// 
 	int map_number; 
+	// 
 };
 

@@ -214,3 +214,10 @@ int player::return_score()
 {
 	return score;
 }
+
+
+
+player::player()
+{
+	;
+}
